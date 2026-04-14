@@ -1,104 +1,153 @@
-// Başlangıç için örnek sorular (Gerçekte bunları Firebase'den çekeceksin)
-const defaultQuestions = [
-    { text: "Bugün nasılsın?", options: ["İyiyim", "Biraz yorgunum"] },
-    { text: "İnsanlarla vakit geçirmeyi sever misin?", options: ["Evet", "Hayır, yalnızlığı tercih ederim"] },
-    { text: "En son ne zaman gerçekten güvende hissettin?", options: ["Bugün", "Hatırlamıyorum"] },
-    { text: "Şu an odada yalnız mısın?", options: ["Evet", "Hayır"] },
-    { text: "Emin misin?", options: ["...Evet", "Neden soruyorsun?"] },
-    { text: "Arkanı kontrol etmek ister misin?", options: ["Gerek yok", "Kontrol ettim"] },
-    { text: "Seni izlediğimi biliyor muydun?", options: ["Hayır", "Kapatmak istiyorum"] },
-    { text: "Artık çok geç.", options: ["..."] }
+// Sorular giderek rahatsız edici hale geliyor
+const questions = [
+    { text: "Bugün günlerden ne?", options: ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Hafta sonu"] },
+    { text: "Şu an kendini nasıl hissediyorsun?", options: ["Sakin", "Mutlu", "Yorgun", "Endişeli"] },
+    { text: "En son ne zaman yalan söyledin?", options: ["Bugün", "Geçen hafta", "Hatırlamıyorum"] },
+    { text: "Karanlıktan korkar mısın?", options: ["Hayır", "Bazen"] },
+    { text: "Şu an bulunduğun odada yalnız mısın?", options: ["Evet", "Hayır"] },
+    // GERİLİM BAŞLIYOR
+    { text: "Odanda yalnız olduğuna gerçekten emin misin?", options: ["...Evet", "Neden sordun?"] },
+    { text: "Gözlerini ekrandan ayırdığında duyduğun sesler gerçek mi?", options: ["Ses duymuyorum", "Bilmiyorum"] },
+    { text: "Kapın kilitli mi?", options: ["Evet", "Hayır, kilitlemeli miyim?"] },
+    { text: "Pencereden dışarı baksan... Onu görebilir misin?", options: ["Kimi?", "Perdeler kapalı"] },
+    { text: "Neden nefes alışını tutuyorsun?", options: ["Tutmamıştım", "Farkında değilim"] },
+    // PİK NOKTASI
+    { text: "Şu an evinin neresinde olduğunu biliyorum. Sence neredesin?", options: ["Oturma odası", "Yatak odası", "Söylemeyeceğim"] },
+    { text: "Ekranına çok yakından bakıyorsun.", options: ["Uzaklaştım", "..."] },
+    { text: "Fareyi hareket ettirirken ellerin titriyor mu?", options: ["Hayır", "Biraz"] },
+    { text: "Karanlık olan köşeye bak. Orada ne var?", options: ["Hiçbir şey", "Bakmak istemiyorum"] },
+    { text: "Seni izlemek ne kadar keyifli biliyor musun?", options: ["Dur", "Kimsin sen?"] },
+    { text: "Arkana bakmak için ne kadar daha direneceksin?", options: ["Bakmayacağım", "Kapatmak istiyorum"] },
+    { text: "Gözlerini kırpma.", options: ["..."] }
 ];
 
-let currentQuestionIndex = 0;
-let userName = "";
-let userAnswers = [];
+// Belirli sorulardan önce araya girecek devasa korkutucu yazılar (Soru Indexi : Yazı)
+const interstitials = {
+    6: "SADECE İKİMİZİZ",
+    9: "KAPIYI KİLİTLEMELİYDİN",
+    12: "GÖZLERİNİ EKRANDAN AYIRMA",
+    15: "ARKANA BAKMA"
+};
+
+let currentIndex = 0;
+let audio;
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Cihaz kontrolü: Daha önce girmiş mi?
     if (localStorage.getItem("emloxa_completed") === "true") {
-        showScreen("blocked-screen");
+        document.getElementById("start-screen").classList.remove("active");
+        document.getElementById("blocked-screen").classList.add("active");
         return;
     }
 
-    // Başla butonuna tıklama
     document.getElementById("start-btn").addEventListener("click", () => {
-        const nameInput = document.getElementById("username").value.trim();
-        if (nameInput === "") {
-            alert("Lütfen bir isim gir.");
-            return;
-        }
-        userName = nameInput;
-        startGame();
+        const name = document.getElementById("username").value.trim();
+        if(name === "") return alert("Adını girmeden devam edemezsin.");
+        
+        startSurvey();
     });
 });
 
-function startGame() {
-    // Sesi başlat (Kullanıcı tıkladığı için tarayıcı izin verir)
-    const audio = document.getElementById("bg-music");
+function startSurvey() {
+    // Ses Ayarları
+    audio = document.getElementById("bg-music");
     audio.volume = 0.5;
-    audio.play().catch(e => console.log("Ses oynatılamadı."));
+    
+    // Sesin tonunun korunmasını engelle. Bu sayede yavaşladıkça ses kalınlaşır ve şeytanileşir.
+    audio.preservesPitch = false; 
+    if (audio.mozPreservesPitch !== undefined) audio.mozPreservesPitch = false;
+    if (audio.webkitPreservesPitch !== undefined) audio.webkitPreservesPitch = false;
+    
+    audio.play().catch(e => console.log("Ses çalınamadı"));
 
-    showScreen("survey-screen");
+    document.getElementById("start-screen").classList.remove("active");
     loadQuestion();
 }
 
 function loadQuestion() {
-    if (currentQuestionIndex >= defaultQuestions.length) {
+    if (currentIndex >= questions.length) {
         finishSurvey();
         return;
     }
 
-    const q = defaultQuestions[currentQuestionIndex];
-    document.getElementById("question-text").innerText = q.text;
+    // Ara kesit kontrolü (Interstitial)
+    if (interstitials[currentIndex]) {
+        triggerInterstitial(interstitials[currentIndex]);
+        delete interstitials[currentIndex]; // Bir daha gösterme
+        return;
+    }
+
+    updateAtmosphere();
+
+    const q = questions[currentIndex];
+    const qText = document.getElementById("question-text");
+    qText.innerText = q.text;
     
     const optionsContainer = document.getElementById("options-container");
-    optionsContainer.innerHTML = ""; // Önceki şıkları temizle
+    optionsContainer.innerHTML = ""; 
 
-    q.options.forEach(optionText => {
+    q.options.forEach(opt => {
         const btn = document.createElement("button");
-        btn.innerText = optionText;
-        btn.addEventListener("click", () => handleAnswer(optionText));
+        btn.innerText = opt;
+        btn.addEventListener("click", () => {
+            currentIndex++;
+            loadQuestion();
+        });
         optionsContainer.appendChild(btn);
     });
 
-    updateTheme();
+    document.getElementById("survey-screen").classList.add("active");
 }
 
-function handleAnswer(answer) {
-    // Cevabı kaydet
-    userAnswers.push({
-        question: defaultQuestions[currentQuestionIndex].text,
-        answer: answer
-    });
+function triggerInterstitial(text) {
+    document.getElementById("survey-screen").classList.remove("active");
+    const interScreen = document.getElementById("interstitial-screen");
+    const interText = document.getElementById("interstitial-text");
+    
+    interText.innerText = text;
+    interText.setAttribute("data-text", text);
+    interScreen.classList.add("active");
 
-    currentQuestionIndex++;
-    loadQuestion();
+    // Ekranı sars
+    document.body.classList.add("shake");
+
+    // 2-3 saniye sonra soruyu yükle
+    setTimeout(() => {
+        interScreen.classList.remove("active");
+        document.body.classList.remove("shake");
+        loadQuestion();
+    }, 2500 + Math.random() * 1000);
 }
 
-function updateTheme() {
-    // Soruların ilerlemesine göre sitenin temasını gitgide daha korkunç yap
-    const progress = currentQuestionIndex / defaultQuestions.length;
-    let themeLevel = 1;
+function updateAtmosphere() {
+    const progress = currentIndex / questions.length;
 
-    if (progress > 0.25) themeLevel = 2;
-    if (progress > 0.50) themeLevel = 3;
-    if (progress > 0.75) themeLevel = 4;
+    // 1. Tema Değişikliği
+    let level = 1;
+    if (progress > 0.3) level = 2;
+    if (progress > 0.6) level = 3;
+    if (progress > 0.8) level = 4;
+    document.body.className = `theme-level-${level}`;
 
-    document.body.className = `theme-level-${themeLevel}`;
+    // 2. Ses Distorsiyonu (Pitch ve Hız Yavaşlaması)
+    // Progress %0 iken hız 1.0, progress %100 iken hız 0.3'e kadar düşer.
+    if(audio) {
+        let newRate = 1.0 - (progress * 0.7);
+        if(newRate < 0.3) newRate = 0.3; // Çok da durmasın
+        audio.playbackRate = newRate;
+    }
+
+    // 3. Son sorulara doğru siteyi yavaşça titret
+    if (progress > 0.85) {
+        document.getElementById("main-container").classList.add("shake");
+    }
 }
 
 function finishSurvey() {
-    showScreen("end-screen");
+    document.getElementById("survey-screen").classList.remove("active");
+    document.getElementById("end-screen").classList.add("active");
     
-    // Aynı tarayıcıdan tekrar girmeyi engelle (Cihaz kilidi)
+    // Sesi tamamen kapat veya en dibe çek
+    if(audio) audio.playbackRate = 0.1;
+
     localStorage.setItem("emloxa_completed", "true");
-
-    // NOT: Burada userAnswers ve userName verilerini Firebase veritabanına göndermen gerekir.
-    console.log("Kaydedilecek Veriler:", userName, userAnswers);
-}
-
-function showScreen(screenId) {
-    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-    document.getElementById(screenId).classList.add("active");
 }
