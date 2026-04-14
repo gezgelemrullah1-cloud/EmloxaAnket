@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emloxa - Admin Terminal</title>
+    <style>
+        body {
+            background-color: #050505; color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px; margin: 0;
+        }
+        h1 { border-bottom: 1px solid #0f0; padding-bottom: 10px; }
+        .victim-card {
+            background-color: #111; border: 1px solid #0f0;
+            padding: 15px; margin-bottom: 20px; border-radius: 5px;
+        }
+        .victim-card h2 { margin-top: 0; color: #ff3333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+        th { background-color: #222; color: #0f0; }
+        td { color: #ccc; }
+        .danger { color: #ff3333; }
+        .btn {
+            background: transparent; color: #0f0; border: 1px solid #0f0;
+            padding: 10px 20px; cursor: pointer; margin-bottom: 20px; font-family: inherit;
+        }
+        .btn:hover { background: #0f0; color: #000; }
+    </style>
+</head>
+<body>
+
+    <h1>EMLOXA // KURBAN VERİTABANI</h1>
+    <button class="btn" onclick="clearData()">Tüm Verileri Sil</button>
+    <button class="btn" onclick="window.location.href='index.html'">Geri Dön</button>
+
+    <div id="data-container">
+        </div>
+
+    <script>
+        function loadData() {
+            const container = document.getElementById("data-container");
+            container.innerHTML = "";
+            
+            const rawData = localStorage.getItem("emloxa_victims");
+            
+            if (!rawData) {
+                container.innerHTML = "<p>Sistemde henüz bir kurban bulunmuyor...</p>";
+                return;
+            }
+
+            const victims = JSON.parse(rawData);
+
+            // Her kurban için bir tablo oluştur
+            victims.forEach((victim, index) => {
+                let html = `
+                <div class="victim-card">
+                    <h2>Kurban: ${victim.name} <span style="font-size:14px; color:#555;">(Tarih: ${victim.date})</span></h2>
+                    <table>
+                        <tr>
+                            <th>Soru</th>
+                            <th>Verdiği Cevap</th>
+                        </tr>`;
+
+                victim.answers.forEach(item => {
+                    html += `
+                        <tr>
+                            <td>${item.soru}</td>
+                            <td class="danger">${item.cevap}</td>
+                        </tr>`;
+                });
+
+                html += `</table></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function clearData() {
+            if(confirm("Tüm kurban verilerini silmek istediğine emin misin?")) {
+                localStorage.removeItem("emloxa_victims");
+                loadData();
+            }
+        }
+
+        // Sayfa açıldığında verileri yükle
+        loadData();
+    </script>
+</body>
+</html>
