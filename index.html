@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emloxa - Bir Anket</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-level-1">
+    
+    <audio id="bg-music" loop>
+        <source src="sound.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="container">
+        <div id="start-screen" class="screen active">
+            <h1>Emloxa'ya Hoş Geldin.</h1>
+            <p>Lütfen devam etmek için adını gir.</p>
+            <input type="text" id="username" placeholder="Adın nedir?" autocomplete="off">
+            <button id="start-btn">Başla</button>
+        </div>
+
+        <div id="survey-screen" class="screen">
+            <h2 id="question-text">Soru buraya gelecek...</h2>
+            <div id="options-container" class="options">
+                </div>
+        </div>
+
+        <div id="end-screen" class="screen">
+            <h1>Katılımın için teşekkürler.</h1>
+            <p>Artık gidebilirsin.</p>
+        </div>
+        
+        <div id="blocked-screen" class="screen">
+            <h1>Bunu zaten yaptın.</h1>
+            <p>İkinci bir şansın yok.</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
