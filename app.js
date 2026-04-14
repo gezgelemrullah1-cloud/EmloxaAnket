@@ -149,5 +149,5 @@ function finishSurvey() {
     // Sesi tamamen kapat veya en dibe çek
     if(audio) audio.playbackRate = 0.1;
 
-    localStorage.setItem("emloxa_completed", "true");
+  
 }
