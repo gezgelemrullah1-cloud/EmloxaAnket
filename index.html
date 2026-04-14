@@ -3,38 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emloxa - Bir Anket</title>
+    <title>Emloxa</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-level-1">
     
+    <div class="crt-overlay"></div>
+    <div class="vignette"></div>
+
     <audio id="bg-music" loop>
         <source src="sound.mp3" type="audio/mpeg">
     </audio>
 
-    <div class="container">
+    <div class="container" id="main-container">
         <div id="start-screen" class="screen active">
-            <h1>Emloxa'ya Hoş Geldin.</h1>
-            <p>Lütfen devam etmek için adını gir.</p>
-            <input type="text" id="username" placeholder="Adın nedir?" autocomplete="off">
-            <button id="start-btn">Başla</button>
+            <h1 class="glitch-text" data-text="Emloxa">Emloxa</h1>
+            <p>Dürüstlük, tek çıkış yolundur.</p>
+            <input type="text" id="username" placeholder="Gerçek adını yaz..." autocomplete="off">
+            <button id="start-btn">Kabul Ediyorum</button>
         </div>
 
         <div id="survey-screen" class="screen">
-            <h2 id="question-text">Soru buraya gelecek...</h2>
-            <div id="options-container" class="options">
-                </div>
+            <h2 id="question-text" class="fade-text">...</h2>
+            <div id="options-container" class="options"></div>
         </div>
 
         <div id="end-screen" class="screen">
-            <h1>Katılımın için teşekkürler.</h1>
-            <p>Artık gidebilirsin.</p>
+            <h1 class="glitch-text" data-text="BİTTİ">BİTTİ</h1>
+            <p>Artık arkana bakabilirsin.</p>
         </div>
         
         <div id="blocked-screen" class="screen">
-            <h1>Bunu zaten yaptın.</h1>
-            <p>İkinci bir şansın yok.</p>
+            <h1 style="color:red;">BUNU ZATEN YAPTIN.</h1>
+            <p>Neden tekrar geldin?</p>
         </div>
+    </div>
+
+    <div id="interstitial-screen" class="screen hidden-fullscreen">
+        <h1 id="interstitial-text" class="glitch-text" data-text=""></h1>
     </div>
 
     <script src="app.js"></script>
