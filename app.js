@@ -1,7 +1,3 @@
-// ==== TARAYICI HAFIZASINI ZORLA TEMİZLE (Kilit Kesin Olarak Kalkar) ====
-localStorage.removeItem("emloxa_completed");
-
-// ==== 1. UZUN VE PSİKOLOJİK SORULAR ====
 const questions = [
     { text: "Bugün günlerden ne?", options: ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Hafta sonu"] },
     { text: "Kendini genelde mutlu bir insan olarak tanımlar mısın?", options: ["Evet", "Hayır", "Emin değilim"] },
@@ -24,7 +20,6 @@ const questions = [
     { text: "Artık çok geç.", options: ["..."] }
 ];
 
-// ==== 2. ARA KESİTLER (JUMPSCARE METİNLERİ) ====
 const interstitials = {
     6: "HİÇBİR ŞEYİN ANLAMI YOK",
     10: "BU BİR RÜYA DEĞİL",
@@ -41,8 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("start-btn").addEventListener("click", () => {
         const nameInput = document.getElementById("username").value.trim();
 
+        // Admin paneline giden gizli şifre
         if (nameInput === "Emloxa") {
-            window.location.href = "admin.html"; // Admin paneli
+            window.location.href = "admin.html"; 
             return;
         }
 
@@ -60,12 +56,11 @@ function startSurvey() {
     audio = document.getElementById("bg-music");
     audio.volume = 0.5;
     
-    // Ses Distorsiyonu
     audio.preservesPitch = false; 
     if (audio.mozPreservesPitch !== undefined) audio.mozPreservesPitch = false;
     if (audio.webkitPreservesPitch !== undefined) audio.webkitPreservesPitch = false;
     
-    audio.play().catch(e => console.log("Ses çalınamadı."));
+    audio.play().catch(e => console.log("Ses için etkileşim gerekiyor."));
 
     document.getElementById("start-screen").classList.remove("active");
     loadQuestion();
@@ -95,10 +90,7 @@ function loadQuestion() {
         const btn = document.createElement("button");
         btn.innerText = opt;
         btn.addEventListener("click", () => {
-            userAnswers.push({
-                soru: q.text,
-                cevap: opt
-            });
+            userAnswers.push({ soru: q.text, cevap: opt });
             currentIndex++;
             loadQuestion();
         });
@@ -110,7 +102,6 @@ function loadQuestion() {
 
 function triggerInterstitial(text) {
     document.getElementById("survey-screen").classList.remove("active");
-    
     const interScreen = document.getElementById("interstitial-screen");
     const interText = document.getElementById("interstitial-text");
     
@@ -157,6 +148,15 @@ function finishSurvey() {
         audio.volume = 0.2;
     }
 
-    console.log("Kullanıcı:", userName);
-    console.log("Cevaplar:", userAnswers);
+    // CEVAPLARI ADMIN PANELİ İÇİN KAYDET (Yerel Hafıza)
+    const victimData = {
+        name: userName,
+        answers: userAnswers,
+        date: new Date().toLocaleString()
+    };
+    
+    // Eski listeyi al, yeni kurbanı ekle ve tekrar kaydet
+    let allVictims = JSON.parse(localStorage.getItem("emloxa_victims")) || [];
+    allVictims.push(victimData);
+    localStorage.setItem("emloxa_victims", JSON.stringify(allVictims));
 }
