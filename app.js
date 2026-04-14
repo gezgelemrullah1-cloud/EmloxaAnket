@@ -1,23 +1,19 @@
+// ==== TARAYICI HAFIZASINI ZORLA TEMİZLE (Kilit Kesin Olarak Kalkar) ====
+localStorage.removeItem("emloxa_completed");
+
 // ==== 1. UZUN VE PSİKOLOJİK SORULAR ====
 const questions = [
-    // Aşama 1: Sıradan ve Masum
     { text: "Bugün günlerden ne?", options: ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Hafta sonu"] },
     { text: "Kendini genelde mutlu bir insan olarak tanımlar mısın?", options: ["Evet", "Hayır", "Emin değilim"] },
     { text: "Şu anki hayatından memnun musun?", options: ["Çoğunlukla", "Daha iyi olabilirdi", "Hiç değilim"] },
-    
-    // Aşama 2: Varoluşsal ve Derin
     { text: "Geri dönüp tamamen silmek istediğin bir anın var mı?", options: ["Evet, çok var", "Sadece bir tane", "Hayır, hepsi beni ben yaptı"] },
     { text: "Özgür iradenin gerçekten var olduğuna inanıyor musun?", options: ["Evet, kendi kararlarımı alıyorum", "Hayır, her şey bir illüzyon"] },
     { text: "Ya şu an verdiğin tüm cevaplar daha önceden senin için belirlenmişse?", options: ["Bu saçmalık", "Bazen ben de öyle hissediyorum"] },
     { text: "Seni unutacakları o son gün geldiğinde, geriye ne kalacak?", options: ["Anılarım", "Başarılarım", "Kocaman bir hiçlik"] },
-    
-    // Aşama 3: Rahatsız Edici ve Klostrofobik
     { text: "Hiç aynaya uzun süre bakıp, yansımanın sana ait olmadığını hissettin mi?", options: ["Evet", "Hayır", "Denemedim"] },
     { text: "Uykuya daldığında zihnin nereye gidiyor?", options: ["Karanlığa", "Rüyalara", "Uyanıp uyanmadığımı bilmiyorum"] },
     { text: "Gerçekten uyandığından emin misin?", options: ["...Evet?", "Emin değilim"] },
     { text: "Yalnızlık bir tercih mi, yoksa kaçınılmaz bir son mu?", options: ["Tercih", "Kaçınılmaz son"] },
-    
-    // Aşama 4: Doğrudan Tehdit ve Paranoya
     { text: "Biri seni izlediğinde ensendeki tüylerin ürperdiğini bilirsin. Şu an hissediyor musun?", options: ["Hayır", "Biraz"] },
     { text: "Neden nefes alışını manuel olarak kontrol etmeye başladın?", options: ["Farkında değildim", "Yapmadım"] },
     { text: "Şu an bulunduğun odada tamamen yalnız mısın?", options: ["Evet", "Hayır"] },
@@ -29,7 +25,6 @@ const questions = [
 ];
 
 // ==== 2. ARA KESİTLER (JUMPSCARE METİNLERİ) ====
-// Soru sayısını artırdığımız için ara kesitlerin yerlerini güncelledik.
 const interstitials = {
     6: "HİÇBİR ŞEYİN ANLAMI YOK",
     10: "BU BİR RÜYA DEĞİL",
@@ -43,14 +38,11 @@ let userName = "";
 let userAnswers = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-    // NOT: "Bunu zaten yaptın" kilidi test edebilmen için TAMAMEN kaldırıldı.
-    // Artık her seferinde sayfayı yenileyip baştan başlayabilirsin.
-
     document.getElementById("start-btn").addEventListener("click", () => {
         const nameInput = document.getElementById("username").value.trim();
 
         if (nameInput === "Emloxa") {
-            window.location.href = "admin.html"; // Admin paneli için gizli geçiş
+            window.location.href = "admin.html"; // Admin paneli
             return;
         }
 
@@ -68,12 +60,12 @@ function startSurvey() {
     audio = document.getElementById("bg-music");
     audio.volume = 0.5;
     
-    // Ses Distorsiyonu (Pitch'i düşürerek sesi kalınlaştırma)
+    // Ses Distorsiyonu
     audio.preservesPitch = false; 
     if (audio.mozPreservesPitch !== undefined) audio.mozPreservesPitch = false;
     if (audio.webkitPreservesPitch !== undefined) audio.webkitPreservesPitch = false;
     
-    audio.play().catch(e => console.log("Ses için ekrana tıklanması gerekiyor."));
+    audio.play().catch(e => console.log("Ses çalınamadı."));
 
     document.getElementById("start-screen").classList.remove("active");
     loadQuestion();
@@ -136,24 +128,20 @@ function triggerInterstitial(text) {
 }
 
 function updateAtmosphere() {
-    // Soru sayısına göre (19 soru) ilerlemeyi hesaplar
     const progress = currentIndex / questions.length;
 
-    // 1. Tema Kararması
     let level = 1;
-    if (progress > 0.25) level = 2; // Varoluşsal kriz başlarken
-    if (progress > 0.55) level = 3; // Paranoya başlarken
-    if (progress > 0.80) level = 4; // Doğrudan tehdit
+    if (progress > 0.25) level = 2; 
+    if (progress > 0.55) level = 3; 
+    if (progress > 0.80) level = 4; 
     document.body.className = `theme-level-${level}`;
 
-    // 2. Ses Distorsiyonu
     if(audio) {
         let newRate = 1.0 - (progress * 0.7); 
         if(newRate < 0.25) newRate = 0.25; 
         audio.playbackRate = newRate;
     }
 
-    // 3. Kalıcı Titreme (Son sorular)
     if (progress > 0.85) {
         document.getElementById("main-container").classList.add("shake");
     }
@@ -169,10 +157,6 @@ function finishSurvey() {
         audio.volume = 0.2;
     }
 
-    // TEST İÇİN YORUM SATIRINA ALINDI:
-    // localStorage.setItem("emloxa_completed", "true"); 
-
-    console.log("TEST - Kaydedilen Veriler:");
     console.log("Kullanıcı:", userName);
     console.log("Cevaplar:", userAnswers);
 }
