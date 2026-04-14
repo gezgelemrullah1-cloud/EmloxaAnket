@@ -1,6 +1,6 @@
 :root {
-    --bg-color: #e0e0e0;
-    --text-color: #333;
+    --bg-color: #dcdcdc;
+    --text-color: #111;
     --box-bg: #fff;
     --btn-color: #333;
     --transition-speed: 3s;
@@ -10,14 +10,13 @@ body {
     margin: 0; padding: 0;
     background-color: var(--bg-color);
     color: var(--text-color);
-    font-family: 'Courier New', Courier, monospace; /* Daktilo/Terminal hissi */
+    font-family: 'Courier New', Courier, monospace;
     transition: all var(--transition-speed) ease;
     display: flex; justify-content: center; align-items: center;
     height: 100vh; overflow: hidden;
     user-select: none;
 }
 
-/* Eski TV / Kamera Efekti (Scanlines) */
 .crt-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
@@ -25,7 +24,6 @@ body {
     z-index: 998; pointer-events: none; opacity: 0.3;
 }
 
-/* Köşeleri karartma efekti */
 .vignette {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.8) 100%);
@@ -44,7 +42,6 @@ body {
 .screen { display: none; }
 .screen.active { display: block; animation: fadeIn 1s; }
 
-/* Ara Ekranlar (Kocaman yazılar) */
 .hidden-fullscreen {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background-color: black; color: red;
@@ -52,7 +49,7 @@ body {
     z-index: 1000;
 }
 .hidden-fullscreen.active { display: flex; }
-.hidden-fullscreen h1 { font-size: 5rem; text-transform: uppercase; margin: 0; }
+.hidden-fullscreen h1 { font-size: 5rem; text-transform: uppercase; margin: 0; text-align: center;}
 
 input {
     width: 80%; padding: 15px; margin: 30px 0;
@@ -69,7 +66,7 @@ button {
 }
 button:hover { background-color: var(--text-color); color: var(--box-bg); }
 
-/* ==== TEMALAR ==== */
+/* Temalar */
 body.theme-level-1 { --bg-color: #dcdcdc; --text-color: #111; --box-bg: #fff; }
 body.theme-level-2 { --bg-color: #4a4a4a; --text-color: #ddd; --box-bg: #2a2a2a; }
 body.theme-level-3 { --bg-color: #111; --text-color: #888; --box-bg: #000; .vignette { opacity: 0.8; } }
@@ -79,7 +76,6 @@ body.theme-level-4 {
     .container { border: 1px solid #300; }
 }
 
-/* Ekran Titreme Efekti (Sonda kullanılacak) */
 .shake { animation: shake 0.5s infinite; }
 @keyframes shake {
     0% { transform: translate(1px, 1px) rotate(0deg); }
@@ -95,21 +91,12 @@ body.theme-level-4 {
     100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
 
-/* Glitch Efekti */
 .glitch-text { position: relative; }
 .glitch-text::before, .glitch-text::after {
-    content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    opacity: 0.8;
+    content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.8;
 }
 .glitch-text::before { left: 2px; text-shadow: -1px 0 red; animation: glitch-anim-1 2s infinite linear alternate-reverse; }
 .glitch-text::after { left: -2px; text-shadow: -1px 0 blue; animation: glitch-anim-2 3s infinite linear alternate-reverse; }
 
-@keyframes glitch-anim-1 {
-    0% { clip-path: inset(20% 0 80% 0); }
-    20% { clip-path: inset(60% 0 10% 0); }
-    40% { clip-path: inset(40% 0 50% 0); }
-    60% { clip-path: inset(80% 0 5% 0); }
-    80% { clip-path: inset(10% 0 70% 0); }
-    100% { clip-path: inset(30% 0 20% 0); }
-}
+@keyframes glitch-anim-1 { 0% { clip-path: inset(20% 0 80% 0); } 20% { clip-path: inset(60% 0 10% 0); } 40% { clip-path: inset(40% 0 50% 0); } 60% { clip-path: inset(80% 0 5% 0); } 80% { clip-path: inset(10% 0 70% 0); } 100% { clip-path: inset(30% 0 20% 0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
